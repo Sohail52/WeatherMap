@@ -1,48 +1,67 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
-const Api_key = "";
+const Api_key = "36073cb084c211629b3865a0139ef33a";
 
 const App = () => {
   const inputRef = useRef(null);
   const [apiData, setApiData] = useState(null);
   const [showWeather, setShowWeather] = useState(null);
-
   const [loading, setLoading] = useState(false);
 
   const WeatherTypes = [
-    {
-      type: "Clear",
-      img: "https://cdn-icons-png.flaticon.com/512/6974/6974833.png",
-    },
-    {
-      type: "Rain",
-      img: "https://cdn-icons-png.flaticon.com/512/3351/3351979.png",
-    },
-    {
-      type: "Snow",
-      img: "https://cdn-icons-png.flaticon.com/512/642/642102.png",
-    },
-    {
-      type: "Clouds",
-      img: "https://cdn-icons-png.flaticon.com/512/414/414825.png",
-    },
-    {
-      type: "Haze",
-      img: "https://cdn-icons-png.flaticon.com/512/1197/1197102.png",
-    },
-    {
-      type: "Smoke",
-      img: "https://cdn-icons-png.flaticon.com/512/4380/4380458.png",
-    },
-    {
-      type: "Mist",
-      img: "https://cdn-icons-png.flaticon.com/512/4005/4005901.png",
-    },
-    {
-      type: "Drizzle",
-      img: "https://cdn-icons-png.flaticon.com/512/3076/3076129.png",
-    },
+    { type: "Clear", img: "https://cdn-icons-png.flaticon.com/512/6974/6974833.png" },
+    { type: "Rain", img: "https://cdn-icons-png.flaticon.com/512/3351/3351979.png" },
+    { type: "Snow", img: "https://cdn-icons-png.flaticon.com/512/642/642102.png" },
+    { type: "Clouds", img: "https://cdn-icons-png.flaticon.com/512/414/414825.png" },
+    { type: "Haze", img: "https://cdn-icons-png.flaticon.com/512/1197/1197102.png" },
+    { type: "Smoke", img: "https://cdn-icons-png.flaticon.com/512/4380/4380458.png" },
+    { type: "Mist", img: "https://cdn-icons-png.flaticon.com/512/4005/4005901.png" },
+    { type: "Drizzle", img: "https://cdn-icons-png.flaticon.com/512/3076/3076129.png" },
   ];
+
+  useEffect(() => {
+    // Function to get user's location
+    const getLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            fetchWeatherByCoords(latitude, longitude);
+          },
+          (error) => {
+            console.error("Error getting geolocation", error);
+            alert("Please enable location services to use this feature.");
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    };
+
+    // Fetch weather data based on user's location
+    const fetchWeatherByCoords = async (lat, lon) => {
+      const URL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${Api_key}`;
+      setLoading(true);
+      fetch(URL)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.cod === 200) {
+            inputRef.current.value = data.name; // Set the input field to the city's name
+            fetchWeather();
+          } else {
+            alert("Failed to retrieve weather data for your location.");
+          }
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching weather data by coords", err);
+          setLoading(false);
+        });
+    };
+
+    // Fetch weather when the component mounts
+    getLocation();
+  }, []);
 
   const fetchWeather = async () => {
     const URL = `https://api.openweathermap.org/data/2.5/weather?q=${inputRef.current.value}&units=metric&appid=${Api_key}`;
@@ -51,22 +70,14 @@ const App = () => {
       .then((res) => res.json())
       .then((data) => {
         setApiData(null);
-        if (data.cod == 404 || data.cod == 400) {
-          // ARRAY OF OBJ
+        if (data.cod === 404 || data.cod === 400) {
           setShowWeather([
-            {
-              type: "Not Found",
-              img: "https://cdn-icons-png.flaticon.com/512/4275/4275497.png",
-            },
+            { type: "Not Found", img: "https://cdn-icons-png.flaticon.com/512/4275/4275497.png" },
           ]);
+        } else {
+          setShowWeather(WeatherTypes.filter((weather) => weather.type === data.weather[0].main));
+          setApiData(data);
         }
-        setShowWeather(
-          WeatherTypes.filter(
-            (weather) => weather.type === data.weather[0].main
-          )
-        );
-        console.log(data);
-        setApiData(data);
         setLoading(false);
       })
       .catch((err) => {
@@ -83,8 +94,7 @@ const App = () => {
             type="text"
             ref={inputRef}
             placeholder="Enter Your Location"
-            className="text-xl border-b
-          p-1 border-gray-200 font-semibold uppercase flex-1"
+            className="text-xl border-b p-1 border-gray-200 font-semibold uppercase flex-1"
           />
           <button onClick={fetchWeather}>
             <img
@@ -95,8 +105,7 @@ const App = () => {
           </button>
         </div>
         <div
-          className={`duration-300 delay-75  overflow-hidden
-         ${showWeather ? "h-[27rem]" : "h-0"}`}
+          className={`duration-300 delay-75 overflow-hidden ${showWeather ? "h-[27rem]" : "h-0"}`}
         >
           {loading ? (
             <div className="grid place-items-center h-full">
@@ -114,14 +123,8 @@ const App = () => {
                     {apiData?.name + "," + apiData?.sys?.country}
                   </p>
                 )}
-                <img
-                  src={showWeather[0]?.img}
-                  alt="..."
-                  className="w-52 mx-auto"
-                />
-                <h3 className="text-2xl font-bold text-zinc-800">
-                  {showWeather[0]?.type}
-                </h3>
+                <img src={showWeather[0]?.img} alt="..." className="w-52 mx-auto" />
+                <h3 className="text-2xl font-bold text-zinc-800">{showWeather[0]?.type}</h3>
 
                 {apiData && (
                   <>
