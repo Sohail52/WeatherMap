@@ -14,37 +14,6 @@ This is a simple weather application built using React.js and the OpenWeatherMap
 - **Tailwind CSS**: For styling the app.
 - **OpenWeatherMap API**: For fetching real-time weather data.
 
-## Installation
-
-To run this project locally, follow these steps:
-
-1. Clone the repository:
-
-   \`\`\`bash
-   git clone git@github.com:yourusername/weather-app.git
-   \`\`\`
-
-2. Navigate to the project directory:
-
-   \`\`\`bash
-   cd weather-app
-   \`\`\`
-
-3. Install the dependencies:
-
-   \`\`\`bash
-   npm install
-   \`\`\`
-
-4. Create a .env file in the root directory and add your OpenWeatherMap API key:
-
-   \`\`\`env
-   REACT_APP_WEATHER_API_KEY=your_api_key
-   \`\`\`
-
-   Replace \`your_api_key\` with your actual OpenWeatherMap API key.
-
-5. Start the development server:
 
    \`\`\`bash
    npm start
