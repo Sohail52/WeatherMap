@@ -1,6 +1,6 @@
 ## Weather App
 
-This is a simple weather application built using React.js and the OpenWeatherMap API. The app allows users to fetch real-time weather data by entering a location or using their current geolocation.
+This is a weather application built using React.js and the OpenWeatherMap API. The app allows users to fetch real-time weather data by entering a location or using their current geolocation.
 
 ## Features
 
